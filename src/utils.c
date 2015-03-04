@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
@@ -13,27 +14,15 @@ int setnonblock(int fd)
 	return fcntl(fd, F_SETFL, flags);
 }
 
-char *get_ip_str(struct sockaddr *sa, char **ps)
-{
-	char *s = malloc(sizeof(char) * INET6_ADDRSTRLEN);
-	switch(sa->sa_family) {
-		case AF_INET:
-		inet_ntop(AF_INET, &(((struct sockaddr_in *)sa)->sin_addr),
-		          s, INET6_ADDRSTRLEN);
-		break;
+static void *get_in_addr(struct sockaddr *sa) {
+	if (sa->sa_family == AF_INET)
+		return &(((struct sockaddr_in*)sa)->sin_addr);
+	return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
 
-		case AF_INET6:
-		inet_ntop(AF_INET6, &(((struct sockaddr_in6 *)sa)->sin6_addr),
-		          s, INET6_ADDRSTRLEN);
-		break;
-
-		default:
-		sprintf(s, "Unknown AF %i", sa->sa_family);
-		// strncpy(s, "Unknown AF", maxlen);
+char *get_ip_str(struct sockaddr *sa, char *s, ssize_t maxlen) {
+	if (inet_ntop(sa->sa_family, get_in_addr((struct sockaddr *)sa), s, maxlen) == NULL) {
 		return NULL;
 	}
-
-	(*ps) = s;
-
 	return s;
 }

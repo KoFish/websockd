@@ -77,10 +77,9 @@ void add_client_socket(EV_P_ int cfd) {
 		}
 	}
 	if (wrk >= 0) {
-		ssize_t c;
 		worker_t *worker = &workers[wrk];
 		worker->clients += 1;
-		c = sock_fd_write(worker->ctrl_sock, WCMD_ADD_CLIENT, strlen(WCMD_ADD_CLIENT), cfd);
+		sock_fd_write(worker->ctrl_sock, WCMD_ADD_CLIENT, strlen(WCMD_ADD_CLIENT), cfd);
 	}
 }
 

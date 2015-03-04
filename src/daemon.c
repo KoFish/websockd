@@ -50,12 +50,17 @@ static int setup_accept_socket(EV_P) {
 }
 
 static void accept_cb(EV_P_ ev_io *w, int revents) {
-	struct sockaddr client;
-	socklen_t addrlen;
-	int sock = accept(w->fd, &client, &addrlen);
-	char *ip_addr;
-	get_ip_str(&client, &ip_addr);
-	printf("got connection from %s\n", ip_addr);
+	struct sockaddr_in client;
+	socklen_t addrlen = sizeof(struct sockaddr_in);
+	int sock = accept(w->fd, (struct sockaddr*)&client, &addrlen);
+	char ip_addr[INET6_ADDRSTRLEN];
+	int remote_port;
+	if (get_ip_str((struct sockaddr*)&client, ip_addr, INET6_ADDRSTRLEN) == NULL) {
+		perror("accept_cb");
+		close(sock);
+	}
+	remote_port = ntohs(client.sin_port);
+	printf("got connection from %s:%i\n", ip_addr, remote_port);
 	add_client_socket(EV_A_ sock);
 	// ev_io_stop(EV_A_ w);
 }
