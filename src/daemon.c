@@ -62,7 +62,6 @@ static void accept_cb(EV_P_ ev_io *w, int revents) {
 	remote_port = ntohs(client.sin_port);
 	printf("got connection from %s:%i\n", ip_addr, remote_port);
 	add_client_socket(EV_A_ sock);
-	// ev_io_stop(EV_A_ w);
 }
 
 static void int_cb(EV_P_ ev_signal *w, int revents) {

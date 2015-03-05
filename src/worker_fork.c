@@ -17,34 +17,8 @@ static ev_io ctrl_sock_w;
 
 static ssize_t count_clients(void);
 static void remove_client(client_t**);
-
-static int read_client(client_t *client) {
-	char buff[500];
-	ssize_t c = recv(client->sock, buff, 500, 0);
-	buff[c > 0 ? c-1 : c] = '\0';
-	LOGF("Receieved message from client: %s\n", buff);
-	if (c == 0) {
-		return -1;
-	}
-	add_write(client, buff, c);
-	return c;
-}
-
-static int write_client(client_t *client) {
-	if (client->write_buffer != NULL) {
-		char *b = client->write_buffer->buff;
-		ssize_t blen = client->write_buffer->bufflen;
-		ssize_t c = send(client->sock, b, blen, 0);
-		if (blen > c) {
-			remove_written(client->write_buffer, c);
-		} else {
-			client->write_buffer = client->write_buffer->next;
-		}
-		return client->write_buffer == NULL ? 0 : 1;
-	} else {
-		return -1;
-	}
-}
+static int read_client(client_t*);
+static int write_client(client_t*);
 
 static void client_cb(EV_P_ ev_io *w, int revents) {
 	client_t *client = clients;
@@ -140,4 +114,32 @@ static void remove_client(client_t **client) {
 	}
 	LOGF("freed client, %i clients left\n", (int)count_clients());
 	(*client) = NULL;
+}
+
+static int read_client(client_t *client) {
+	char buff[500];
+	ssize_t c = recv(client->sock, buff, 500, 0);
+	buff[c > 0 ? c-1 : c] = '\0';
+	LOGF("Receieved message from client: %s\n", buff);
+	if (c == 0) {
+		return -1;
+	}
+	add_write(client, buff, c);
+	return c;
+}
+
+static int write_client(client_t *client) {
+	if (client->write_buffer != NULL) {
+		char *b = client->write_buffer->buff;
+		ssize_t blen = client->write_buffer->bufflen;
+		ssize_t c = send(client->sock, b, blen, 0);
+		if (blen > c) {
+			remove_written(client->write_buffer, c);
+		} else {
+			client->write_buffer = client->write_buffer->next;
+		}
+		return client->write_buffer == NULL ? 0 : 1;
+	} else {
+		return -1;
+	}
 }

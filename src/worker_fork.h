@@ -11,5 +11,4 @@ static const char WCMD_END[] = "END";
 
 void run_worker(EV_P_ int, int);
 
-
 #endif
