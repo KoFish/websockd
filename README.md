@@ -14,7 +14,7 @@ then be directly connected to the new process `stdin` and `stdout`.
 # Credits
 
 This project is heavily inspired by
-websocketd.com[x](https://github.com/joewalnes/websocketd) by Joe Walnes but
+[websocketd.com](https://github.com/joewalnes/websocketd) by Joe Walnes but
 shares, of obvious reasons, no code with that project.
 
 # Alternative solutions
