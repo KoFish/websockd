@@ -4,8 +4,6 @@
 #include <ev.h>
 #include <sys/types.h>
 
-#include "config.h"
-
 struct worker_in {
 	int ctrl_sock;
 	pid_t pid;

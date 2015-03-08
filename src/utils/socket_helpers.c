@@ -2,7 +2,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <arpa/inet.h>
-#include "utils.h"
+#include "socket_helpers.h"
 
 // Simply adds O_NONBLOCK to the file descriptor of choice
 int setnonblock(int fd)

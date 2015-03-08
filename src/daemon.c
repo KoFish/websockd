@@ -10,7 +10,11 @@
 
 #include "config.h"
 #include "worker.h"
-#include "utils.h"
+#include "utils/utils.h"
+
+#define LOG(format) fprintf(stderr, "[main] " format)
+#define LOGF(format, ...) fprintf(stderr, "[main] " format, __VA_ARGS__)
+
 
 static int setup_accept_socket(EV_P) {
 	int sock, s, yes=1;
@@ -27,7 +31,7 @@ static int setup_accept_socket(EV_P) {
 
 	s = getaddrinfo(WS_HOST, WS_PORT, &hints, &result);
 	if (s != 0) {
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+		perror("getaddrinfo");
 		exit(EXIT_FAILURE);
 	}
 	for (rp = result; rp != NULL ; rp = rp->ai_next) {
@@ -42,7 +46,7 @@ static int setup_accept_socket(EV_P) {
 		perror("listen");
 	}
 	if (rp == NULL) {
-		fprintf(stderr, "Could not bind to (%s %s)\n", WS_HOST, WS_PORT);
+		LOGF("Could not bind to (%s %s)\n", WS_HOST, WS_PORT);
 		exit(EXIT_FAILURE);
 	}
 	freeaddrinfo(result);
@@ -60,12 +64,12 @@ static void accept_cb(EV_P_ ev_io *w, int revents) {
 		close(sock);
 	}
 	remote_port = ntohs(client.sin_port);
-	printf("got connection from %s:%i\n", ip_addr, remote_port);
+	LOGF("got connection from %s:%i\n", ip_addr, remote_port);
 	add_client_socket(EV_A_ sock);
 }
 
 static void int_cb(EV_P_ ev_signal *w, int revents) {
-	printf("ctrl-c\n");
+	LOG("ctrl-c\n");
 	stop_workers(EV_A);
 	ev_signal_stop(EV_A_ w);
 }

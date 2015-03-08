@@ -8,8 +8,9 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 
-#include "ancmsg.h"
-#include "utils.h"
+#include "config.h"
+
+#include "utils/utils.h"
 #include "worker.h"
 #include "client.h"
 #include "worker_fork.h"
@@ -134,8 +135,8 @@ static void dworker_ctrl_cb(EV_P_ ev_io *iow, int revents) {
 		}
 	}
 	if (revents & EV_READ) {
-		char buff[500];
-		ssize_t c = recv(worker->ctrl_sock, buff, 500, 0);
+		char buff[CTRL_BUFF_LEN];
+		ssize_t c = recv(worker->ctrl_sock, buff, CTRL_BUFF_LEN, 0);
 		buff[c] = '\0';
 		if (strncmp(buff, WCMD_CLIENT_DISCONNECT, strlen(WCMD_CLIENT_DISCONNECT)) == 0) {
 			worker->clients -= 1;
@@ -161,7 +162,8 @@ static int start_worker(EV_P) {
 			exit(EXIT_FAILURE);
 		}
 		if ((cpid = fork()) == 0) {
-			// ev_loop_fork(EV_A);
+			// ev_loop_fork(EV_A);  // This shouldn't be necessary since the
+									// loops are started with EVFLAG_FORKCHECK
 			close(ctrlsocks[0]);
 			struct ev_loop *subloop = ev_loop_new(EVFLAG_AUTO | EVFLAG_NOENV | EVFLAG_FORKCHECK);
 			run_worker(subloop, w, ctrlsocks[1]);

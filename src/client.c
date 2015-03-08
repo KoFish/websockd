@@ -46,7 +46,7 @@ void free_lbuff(lbuff_t **b) {
 	(*b) = NULL;
 }
 
-void add_write(client_t *client, char *buff, ssize_t bufflen) {
+void add_client_write(client_t *client, char *buff, ssize_t bufflen) {
 	add_lbuff(&(client->write_buffer), buff, bufflen);
 }
 

@@ -1,0 +1,5 @@
+# IMPORTANT!
+
+This project is by no means "finished" or really usable at all. In it's current
+form it can only spawn workers, accept socket connections and handle reading and
+writing to each connection.
